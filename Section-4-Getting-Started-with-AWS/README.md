@@ -34,3 +34,11 @@ Display Storage class
 
 ```aws s3api delete-bucket --bucket awsml-$RANDOM_ID ```
 
+
+---
+# Activity 3 : Versioning hands On
+
+- Follow the steps as above to create S3 bucket, and practice versioning
+
+---
+
