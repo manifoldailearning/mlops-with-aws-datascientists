@@ -4,7 +4,7 @@
 
 --- 
 
-# Activity 1 :
+# Activity 2 : Create S3 Bucket using CLI
 
 ```
 RANDOM_ID=$(aws secretsmanager get-random-password \
@@ -17,26 +17,20 @@ RANDOM_ID=$(aws secretsmanager get-random-password \
 
 ### Create S3 bucket:
 
-`aws s3api create-bucket --bucket awsml-$RANDOM_ID`
+``` aws s3api create-bucket --bucket awsml-$RANDOM_ID```
 
 Upload the file to AWS S3 Bucket
-`aws s3 cp NLP.png s3://awsml-$RANDOM_ID `
+```aws s3 cp NLP.png s3://awsml-$RANDOM_ID ```
 
 Display Storage class
-`aws s3api list-objects-v2 --bucket awsml-$RANDOM_ID `
-
-Lifecycle Config
-`aws s3api put-bucket-lifecycle-configuration \
-    --bucket awsml-$RANDOM_ID \
-    --lifecycle-configuration  file://lifecycle.json \
-    `
+```aws s3api list-objects-v2 --bucket awsml-$RANDOM_ID ```
 
 ## Clean up 
 ### Delete the file you copied to your S3 bucket:
 
-`aws s3 rm s3://awsml-$RANDOM_ID/NLP.png`
+```aws s3 rm s3://awsml-$RANDOM_ID/NLP.png```
 
 ### Delete the S3 bucket:
 
-`aws s3api delete-bucket --bucket awsml-$RANDOM_ID `
+```aws s3api delete-bucket --bucket awsml-$RANDOM_ID ```
 
