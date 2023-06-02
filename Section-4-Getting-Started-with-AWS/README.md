@@ -39,6 +39,9 @@ Display Storage class
 # Activity 3 : Versioning hands On
 
 - Follow the steps as above to create S3 bucket, and practice versioning
+- Upload the same file (without versioning enabled) : It will overwrite
+- Perform Version enablement & upload again
+- delete the new version to get the previous version of file
 
 ---
 
