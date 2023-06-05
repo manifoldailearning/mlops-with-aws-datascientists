@@ -1,0 +1,41 @@
+# What is YAML mean?
+YAML:
+  - Y: YAML
+  - A: Ain't
+  - M: Markup
+  - L: Language
+
+#Lets Start writing YAML
+my-course: "AWS DevOps Professional Certification"
+version: 1.0
+price: 299
+is_public: true
+release_date: 2022-01-10
+pre_enroll: null
+category:
+  - AWS
+  - DevOps
+  - AWS Certification
+course_dev: ["murthy","kavya","nirnay"]
+dev_details:
+  - name: "murthy"
+    email: "support@manifoldailearning.in"
+    role: "Author"
+  - name: "kavya"
+    email: "support@manifoldailearning.in"
+    role: "Co-Author"
+  - name: "nirnay"
+    email: "support@manifoldailearning.in"
+    role: "Editor"  
+  - {name: "navishka", email: "support@manifoldailearning.in", role: "Finance"}
+short_description: >
+  This is a course for 
+  AWS DevOps Professional
+  Certification
+detailed_description: |
+  This course has 
+  been created with
+  the collaboration with
+  Industry Experts and
+  curated by In-house team to
+  give best learning experience
