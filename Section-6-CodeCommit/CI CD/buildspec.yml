@@ -1,0 +1,37 @@
+version: 0.2
+
+env:
+    variables:
+        MY_AWS_REGION: "ap-south-1"
+
+
+phases: 
+    install:
+        runtime-versions:
+            nodejs: 12
+        commands:
+            - echo "Running on $MY_AWS_REGION"
+            - echo "Print Environment Variables"
+            - printenv
+            - echo "Start the installation process"
+            - echo "Installation Process Completed"
+    pre_build:
+        commands: 
+            - echo "This is the start of Pre-Build phase"
+            - echo "Pre-Build phase is now completed"
+    build:
+        commands:
+            - echo "we are currently on build phase"
+            - echo "Build Activity is completed"
+            - echo "Run Basic check whether Website is ready for use"
+            - grep -Fq "AWS Certified DevOps Engineer" index.html
+            - echo "Test was successful"
+            - echo "proceed with next steps"
+    post_build:
+        commands:
+            - echo "We are currently on post_build phase"
+            - echo "post_build phase activity is completed. Moving next to Artifacts"
+
+artifacts:
+    files:
+    - '**/*'
