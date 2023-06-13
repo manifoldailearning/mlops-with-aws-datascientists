@@ -43,7 +43,7 @@ aws s3api put-bucket-versioning --bucket aws-manifold-devops --versioning-config
 # deploy the files into S3
 # https://docs.aws.amazon.com/cli/latest/reference/deploy/push.html
 ```
-aws deploy push --application-name 	my-app --s3-location s3://aws-manifold-devops/	my-app/app.zip --ignore-hidden-files --region ap-south-1 
+aws deploy push --application-name demo-app --s3-location s3://aws-manifold-devops/	demo-app/app.zip --ignore-hidden-files --region ap-south-1 
 ```
 
 
