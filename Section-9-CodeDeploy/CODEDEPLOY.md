@@ -63,7 +63,18 @@ sudo service codedeploy-agent status
 sudo service codedeploy-agent start
 sudo service codedeploy-agent status
 ```
-
+# User data
+```
+#!bin/bash
+sudo yum update -y
+sudo yum install ruby
+sudo yum install wget
+cd /home/ec2-user
+wget https://aws-codedeploy-ap-south-1.s3.ap-south-1.amazonaws.com/latest/install
+chmod +x ./install
+sudo ./install auto
+sudo service codedeploy-agent status
+```
 
 # create a bucket and enable versioning
 # https://docs.aws.amazon.com/cli/latest/reference/s3/mb.html
