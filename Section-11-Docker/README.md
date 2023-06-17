@@ -5,6 +5,7 @@ https://docs.docker.com/desktop/
 # Commands on Hands On
 
 ```
+docker --version
 docker run hello-world
 docker pull busybox
 docker images
