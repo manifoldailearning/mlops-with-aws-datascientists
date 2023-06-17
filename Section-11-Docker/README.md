@@ -17,7 +17,7 @@ docker run -it busybox sh
 docker rm <container_id>
 ```
 
-# Hands On
+# 2. Hands On
 
 
 ```
