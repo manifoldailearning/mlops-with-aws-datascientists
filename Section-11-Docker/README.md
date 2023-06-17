@@ -16,3 +16,19 @@ docker ps -a
 docker run -it busybox sh
 docker rm <container_id>
 ```
+
+# Hands On
+
+
+```
+docker run -d -P --name catgif manifoldailearning/catgif
+docker ps
+docker port catgif
+docker stop catgif
+docker run -p 8888:5000 manifoldailearning/catgif
+docker build -t catgifv2 .
+docker run -p 8888:5000 catgifv2
+docker login
+docker push yourusername/catgif
+```
+
