@@ -1,8 +1,0 @@
-{
-    "Parameters": {
-        "EndpointInstanceCount": "2",
-        "EndpointInstanceType": "ml.c5.large",
-        "EndpointMaxCapacity": "10",
-        "ScalingTarget": "750.0"
-    }
-}

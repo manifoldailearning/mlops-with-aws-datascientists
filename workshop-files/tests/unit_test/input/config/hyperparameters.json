@@ -1,6 +1,0 @@
-{
-    "epochs": "2",
-    "layers": "2",
-    "dense_layer": "64",
-    "batch_size": "8"
-}
