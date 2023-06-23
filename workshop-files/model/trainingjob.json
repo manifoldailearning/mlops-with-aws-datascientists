@@ -1,0 +1,40 @@
+{
+    "AlgorithmSpecification":{
+        "TrainingImage": "<AccountId>.dkr.ecr.<Region>.amazonaws.com/abalone:latest",
+        "TrainingInputMode": "File"
+    },
+    "RoleArn": "arn:aws:iam::<AccountId>:role/MLOps",
+    "OutputDataConfig": {
+        "S3OutputPath": ""
+    },
+    "ResourceConfig": {
+        "InstanceCount": 1,
+        "InstanceType": "ml.m5.xlarge",
+        "VolumeSizeInGB": 30
+    },
+    "TrainingJobName": "",
+    "HyperParameters": {
+        "epochs": "2000",
+        "layers": "2",
+        "dense_layer": "64",
+        "batch_size": "8"
+    },
+    "StoppingCondition": {
+        "MaxRuntimeInSeconds": 360000
+    },
+    "InputDataConfig": [
+        {
+            "ChannelName": "training",
+            "DataSource": {
+                "S3DataSource": {
+                    "S3DataType": "S3Prefix",
+                    "S3Uri": "",
+                    "S3DataDistributionType": "FullyReplicated"
+                }
+            },
+            "ContentType": "text/csv",
+            "CompressionType": "None"
+        }
+    ],
+    "Tags": []
+}

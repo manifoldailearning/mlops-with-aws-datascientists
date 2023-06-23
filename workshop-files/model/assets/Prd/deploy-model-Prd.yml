@@ -1,0 +1,123 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Deploy a model to Sagemaker for Production Hosting
+
+Parameters:
+
+  ModelName:
+    Type: String
+    Description: Name of the model.
+
+  TrainJobId:
+    Type: String
+    Description: Id of the Codepipeline + SagemakerJobs.
+
+  EndpointInstanceCount:
+    Type: Number
+    Description: Number of instances to launch for the endpoint.
+    MinValue: 1
+
+  EndpointInstanceType:
+    Type: String
+    Description: The ML compute instance type for the endpoint.
+  
+  ModelPackageName:
+    Type: String
+    Description: The trained Model Package Name.
+  
+  EndpointMaxCapacity:
+    Type: Number
+    Description: Maximum number of instances to autoscale the endpoint.
+  
+  ScalingTarget:
+    Type: Number
+    Description: Target number of Invocations per Instance.
+
+Resources:
+
+  Model:
+    Type: AWS::SageMaker::Model
+    Properties:
+      PrimaryContainer:
+        ModelPackageName: !Ref ModelPackageName
+      ExecutionRoleArn: !Sub arn:aws:iam::${AWS::AccountId}:role/MLOps
+
+  EndpointConfig:
+    Type: AWS::SageMaker::EndpointConfig
+    Properties:
+      DataCaptureConfig:
+        CaptureContentTypeHeader:
+          CsvContentTypes:
+            - "text/csv"
+        CaptureOptions:
+          - CaptureMode: Input
+          - CaptureMode: Output
+        DestinationS3Uri: !Sub s3://data-${AWS::Region}-${AWS::AccountId}/datacapture
+        EnableCapture: True
+        InitialSamplingPercentage: 100
+      ProductionVariants:
+      - InitialInstanceCount: !Ref EndpointInstanceCount
+        InitialVariantWeight: 1.0
+        InstanceType: !Ref EndpointInstanceType
+        ModelName: !GetAtt Model.ModelName
+        VariantName: AllTraffic
+
+  Endpoint:
+    Type: AWS::SageMaker::Endpoint
+    Properties:
+      EndpointName: !Sub ${ModelName}-prd-endpoint
+      EndpointConfigName: !GetAtt EndpointConfig.EndpointConfigName
+    DependsOn: EndpointConfig
+ 
+  MonitoringSchedule:
+    Type: AWS::SageMaker::MonitoringSchedule
+    Properties:
+      MonitoringScheduleConfig:
+        MonitoringJobDefinition:
+          MonitoringAppSpecification:
+            ImageUri: !Sub "159807026194.dkr.ecr.${AWS::Region}.amazonaws.com/sagemaker-model-monitor-analyzer:latest"
+          MonitoringInputs:
+            - EndpointInput:
+                EndpointName: !GetAtt Endpoint.EndpointName
+                LocalPath: "/opt/ml/processing/endpointdata"
+          MonitoringOutputConfig:
+            MonitoringOutputs:
+              - S3Output:
+                  LocalPath: "/opt/ml/processing/localpath"
+                  S3Uri: !Sub s3://data-${AWS::Region}-${AWS::AccountId}/reports
+          MonitoringResources:
+            ClusterConfig:
+              InstanceCount: 1
+              InstanceType: ml.m5.large
+              VolumeSizeInGB: 50
+          RoleArn: !Sub arn:aws:iam::${AWS::AccountId}:role/MLOps
+        ScheduleConfig:
+          ScheduleExpression: cron(0 * ? * * *)
+      MonitoringScheduleName: !Sub ${ModelName}MonitoringSchedule
+
+  AutoScaling:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MaxCapacity: !Ref EndpointMaxCapacity
+      MinCapacity: !Ref EndpointInstanceCount
+      ResourceId: !Sub endpoint/${Endpoint.EndpointName}/variant/AllTraffic
+      RoleARN: !Sub arn:aws:iam::${AWS::AccountId}:role/MLOps
+      ScalableDimension: sagemaker:variant:DesiredInstanceCount
+      ServiceNamespace: sagemaker
+    DependsOn: Endpoint
+
+  AutoScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties: 
+      PolicyName: SageMakerVariantInvocationsPerInstance
+      PolicyType: TargetTrackingScaling
+      ResourceId: !Sub endpoint/${Endpoint.EndpointName}/variant/AllTraffic
+      ScalableDimension: sagemaker:variant:DesiredInstanceCount
+      ServiceNamespace: sagemaker
+      TargetTrackingScalingPolicyConfiguration:
+        TargetValue: !Ref ScalingTarget
+        ScaleInCooldown: 60
+        ScaleOutCooldown: 60
+        PredefinedMetricSpecification:
+          PredefinedMetricType: SageMakerVariantInvocationsPerInstance
+    DependsOn: AutoScaling
