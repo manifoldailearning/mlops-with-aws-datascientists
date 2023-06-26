@@ -27,6 +27,8 @@ curl -O https://bootstrap.pypa.io/get-pip.py &&\
 sudo python3 get-pip.py --user --no-warn-script-location &&\
 rm get-pip.py &&\
 python3 -m pip install -U pip boto3 numpy pandas wget awscli --user
+wget https://raw.githubusercontent.com/manifoldailearning/mlops-with-aws-datascientists/main/Section-16-mlops-pipeline/mlops-tutorial.zip
+unzip mlops-tutorial.zip
 ```
 
 # 1. Preperation:
@@ -211,6 +213,7 @@ aws cloudformation package --template-file mlops-pipeline.yml \
 ```
 
 ```
+wget https://raw.githubusercontent.com/manifoldailearning/mlops-with-aws-datascientists/main/Section-16-mlops-pipeline/dataset/abalone.csv
 aws s3 cp ~/environment/abalone.csv "s3://${DATA_BUCKET}/input/raw/abalone.csv" --region $AWS_DEFAULT_REGION
 ```
 
