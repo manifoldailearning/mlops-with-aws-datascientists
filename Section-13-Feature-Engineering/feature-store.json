@@ -1,0 +1,254 @@
+[
+  {
+    "FeatureName": "age",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "campaign",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "pdays",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "previous",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "no_previous_contact",
+    "FeatureType": "Integral"
+  },
+  {
+    "FeatureName": "not_working",
+    "FeatureType": "Integral"
+  },
+  {
+    "FeatureName": "FS_ID",
+    "FeatureType": "Integral"
+  },
+  {
+    "FeatureName": "FS_time",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "y_no",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "y_yes",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "poutcome_nonexistent",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "poutcome_success",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "poutcome_failure",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "month_may",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "month_jul",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "month_aug",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "month_jun",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "month_apr",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "month_nov",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "month_oct",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "month_mar",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "month_sep",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "month_dec",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "marital_married",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "marital_single",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "marital_divorced",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "marital_unknown",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "loan_no",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "loan_yes",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "loan_unknown",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "job_admin",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "job_blue-collar",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "job_technician",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "job_services",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "job_management",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "job_retired",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "job_student",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "job_entrepreneur",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "job_self-employed",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "job_unemployed",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "job_housemaid",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "job_unknown",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "housing_yes",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "housing_no",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "housing_unknown",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "education_university_degree",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "education_high_school",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "education_basic_9y",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "education_professional_course",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "education_basic_4y",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "education_basic_6y",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "education_unknown",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "education_illiterate",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "default_no",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "default_unknown",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "default_yes",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "day_of_week_thu",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "day_of_week_wed",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "day_of_week_tue",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "day_of_week_mon",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "day_of_week_fri",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "contact_cellular",
+    "FeatureType": "Fractional"
+  },
+  {
+    "FeatureName": "contact_telephone",
+    "FeatureType": "Fractional"
+  }
+]
