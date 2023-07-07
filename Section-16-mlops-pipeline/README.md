@@ -1,4 +1,11 @@
-# Setting Up the AWS Account
+# Use case
+![Alt text](image.png)
+
+# Architecture 
+![Alt text](image-1.png)
+
+
+# Setting Up the AWS Account & Cloud9 for CLI
 ```
 sudo yum -y install jq bash-completion
 ```
