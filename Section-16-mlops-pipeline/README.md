@@ -45,6 +45,9 @@ wget https://raw.githubusercontent.com/manifoldailearning/mlops-with-aws-datasci
 unzip mlops-tutorial.zip
 ```
 
+```
+~/environment/workshop-files/utils/c9_resize.sh
+```
 # 1. Preperation:
 ## Create S3 Bucket for Storage of dataset (Use Console if required)
 
