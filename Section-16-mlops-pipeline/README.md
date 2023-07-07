@@ -7,6 +7,7 @@
 
 # Setting Up the AWS Account & Cloud9 for CLI
 ```
+aws sts get-caller-identity
 sudo yum -y install jq bash-completion
 ```
 # Variables for Hands On
@@ -34,7 +35,13 @@ curl -O https://bootstrap.pypa.io/get-pip.py &&\
 sudo python3 get-pip.py --user --no-warn-script-location &&\
 rm get-pip.py &&\
 python3 -m pip install -U pip boto3 numpy pandas wget awscli --user
+```
+
+```
 wget https://raw.githubusercontent.com/manifoldailearning/mlops-with-aws-datascientists/main/Section-16-mlops-pipeline/mlops-tutorial.zip
+```
+
+```
 unzip mlops-tutorial.zip
 ```
 
