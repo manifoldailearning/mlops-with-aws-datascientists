@@ -1,0 +1,60 @@
+version: 0.2
+env:
+  variables:
+    THRESHOLD: <Threshold>
+phases:
+  install:
+    runtime-versions:
+      python: 3.8
+    commands:
+      - printenv
+      - echo "Updating build environment ..."
+      - python -m pip install --upgrade --force-reinstall stepfunctions==2.1.0 aws-sam-cli==1.24.1 sagemaker==2.45.0 protobuf~=3.19.0
+      - echo "Initializing Docker daemon ..."
+      - nohup /usr/local/bin/dockerd --host=unix:///var/run/docker.sock --host=tcp://0.0.0.0:2375 --storage-driver=overlay&
+      - timeout 15 sh -c "until docker info; do echo .; sleep 1; done"
+  pre_build:
+    commands:
+      - echo Pre-Build started on `date`
+      - echo "Building workflow resources ..."
+      - |
+        sh -c """
+          cd assets
+          sam build -b deploy/ --use-container \
+                               --manifest requirements.txt \
+                               --template-file workflow-resources.yml
+          """
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo "Deploying workflow resources ..."
+      - |
+        sh -c """
+        cd assets
+        sam deploy  --stack-name ${WORKFLOW_NAME} \
+                    --template-file deploy/template.yaml \
+                    --parameter-overrides ModelName=${MODEL_NAME} \
+                    --capabilities CAPABILITY_NAMED_IAM \
+                    --s3-bucket ${PIPELINE_BUCKET} \
+                    --s3-prefix ${PIPELINE_NAME}/artifacts \
+                    --no-fail-on-empty-changeset \
+                    --no-confirm-changeset
+        """
+      - echo "Creating System Test Workflow ..."
+      - |
+        sh -c """
+        python build.py --pipeline-name=$PIPELINE_NAME \
+                        --image-repo-name=$IMAGE_REPO_NAME \
+                        --image-tag=$IMAGE_TAG \
+                        --model-name=$MODEL_NAME \
+                        --model-package-group-name=$MODEL_GROUP \
+                        --test-endpoint=$MODEL_NAME-dev-endpoint \
+                        --pipeline-bucket=$PIPELINE_BUCKET
+        """
+  post_build:
+    commands:
+      - echo Build completed on `date`
+artifacts:
+  files:
+    - input.json
+  discard-paths: yes

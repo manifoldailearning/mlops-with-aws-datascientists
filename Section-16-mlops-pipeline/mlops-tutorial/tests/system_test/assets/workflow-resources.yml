@@ -1,0 +1,156 @@
+AWSTemplateFormatVersion : 2010-09-09
+
+Transform: AWS::Serverless-2016-10-31
+
+Description: Template to deploy System Test Worflow resources.
+
+Parameters:
+  ModelName:
+    Type: String
+    Description: 'ML Model to exeucte system tests on'
+
+Resources:
+
+  RegisterModelLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-RegisterModelLambda
+      Description: 'Register Production Model'
+      Handler: lambda.handler
+      Role: !GetAtt WorkflowExecutionRole.Arn
+      CodeUri: registerModel/
+      Runtime: python3.8
+      MemorySize: 128
+      Timeout: 120
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Sid: InvokeLambda
+              Effect: Allow
+              Action: 
+                - 'lambda:InvokeFunction'
+                - 'lambda:InvokeAsync'
+              Resource: '*'
+
+  EvaluateEndpointLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda.handler
+      FunctionName: !Sub ${AWS::StackName}-EvaluateEndpointLambda
+      Description: 'Evaluate SageMaker Hosted DEV Model'
+      Role: !GetAtt WorkflowExecutionRole.Arn
+      CodeUri: evaluateEndpoint/
+      Runtime: python3.8
+      MemorySize: 1024
+      Timeout: 120
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Sid: InvokeLambda
+              Effect: Allow
+              Action:
+                - 'lambda:InvokeFunction'
+                - 'lambda:InvokeAsync'
+              Resource: '*'
+
+  WorkflowExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${AWS::StackName}-WorkflowRole
+      Path: '/'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Action:
+              - 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service: 
+                - 'states.amazonaws.com'
+                - 'lambda.amazonaws.com'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/CloudWatchEventsFullAccess'
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+        - 'arn:aws:iam::aws:policy/AmazonSageMakerFullAccess'
+
+  WorkflowExecutionPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub ${AWS::StackName}-WorkflowPolicy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: EventsAccess
+            Effect: Allow
+            Action:
+              - 'events:PutTargets'
+              - 'events:DescribeRule'
+              - 'events:PutRule'
+            Resource:
+              - 'arn:aws:events:*:*:rule/StepFunctionsGetEventsForSageMakerTrainingJobsRule'
+              - 'arn:aws:events:*:*:rule/StepFunctionsGetEventsForSageMakerTransformJobsRule'
+              - 'arn:aws:events:*:*:rule/StepFunctionsGetEventsForSageMakerTuningJobsRule'
+              - 'arn:aws:events:*:*:rule/StepFunctionsGetEventsForECSTaskRule'
+              - 'arn:aws:events:*:*:rule/StepFunctionsGetEventsForBatchJobsRule'
+              - 'arn:aws:events:*:*:rule/StepFunctionsGetEventsForSageMakerProcessingJobsRule'
+              - 'arn:aws:events:*:*:rule/StepFunctionsGetEventForCodeBuildStartBuildRule'
+          - Sid: ResourceAccess
+            Effect: Allow
+            Action:
+              - 'batch:DescribeJobs'
+              - 'batch:SubmitJob'
+              - 'batch:TerminateJob'
+              - 'codebuild:StartBuild'
+              - 'codebuild:StopBuild'
+              - 'codebuild:BatchGetBuilds'
+              - 'codebuild:BatchGetReports'
+              - 'dynamodb:DeleteItem'
+              - 'dynamodb:GetItem'
+              - 'dynamodb:PutItem'
+              - 'dynamodb:UpdateItem'
+              - 'ecs:DescribeTasks'
+              - 'ecs:RunTask'
+              - 'ecs:StopTask'
+              - 'glue:BatchStopJobRun'
+              - 'glue:GetJobRun'
+              - 'glue:GetJobRuns'
+              - 'glue:StartJobRun'
+              - 'iam:PassRole'
+              - 'lambda:InvokeFunction'
+              - 'lambda:InvokeAsync'
+              - 'sns:Publish'
+              - 'sqs:SendMessage'
+              - 's3:GetObject*'
+              - 's3:PutObject*'
+              - 'codepipeline:GetPipelineState'
+            Resource: '*'
+      Roles:
+        - !Ref WorkflowExecutionRole
+
+  WorkflowRoleParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: WorkflowExecRole
+      Type: String
+      Value: !GetAtt WorkflowExecutionRole.Arn
+      Description: 'AWS SageMaker Step Functions workflow execution role arn.'
+  
+  EvaluateEndpointLambdaParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: EvaluateEndpoint
+      Type: String
+      Value: !GetAtt EvaluateEndpointLambda.Arn
+      Description: 'Arn of the Lambda Function that evaluates the SageMaker Endpoint.'
+  
+  RegisterModelLambdaParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: RegisterModel
+      Type: String
+      Value: !GetAtt RegisterModelLambda.Arn
+      Description: 'Arn of the Lambda Function that registers the Production Model'
+
+Outputs:
+  WorkflowExecutionRoleArn:
+    Value: !GetAtt WorkflowExecutionRole.Arn

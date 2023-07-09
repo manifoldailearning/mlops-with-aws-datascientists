@@ -1,0 +1,8 @@
+{
+    "Parameters": {
+        "EndpointInstanceCount": "1",
+        "EndpointInstanceType": "ml.t2.large"
+    }
+}
+  
+  

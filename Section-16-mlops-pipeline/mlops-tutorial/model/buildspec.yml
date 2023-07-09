@@ -1,0 +1,33 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      python: 3.8
+  pre_build:
+    commands:
+      - echo Updating Packages...
+      - pip install --upgrade pip
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Configuring CloudFormation Parameters for $STAGE Deployment...
+      - |
+        sh -c """
+        python build.py --pipeline-name=$PIPELINE_NAME \
+                        --image-repo-name=$IMAGE_REPO_NAME \
+                        --image-tag=$IMAGE_TAG \
+                        --model-name=$MODEL_NAME \
+                        --model-package-group-name=$MODEL_GROUP \
+                        --import-config=$CODEBUILD_SRC_DIR/assets/$STAGE/$STAGE-config.json \
+                        --export-config=$CODEBUILD_SRC_DIR/assets/$STAGE/$STAGE-config-export.json
+        """
+      - echo CloudFormation Parameters...
+      - cat $CODEBUILD_SRC_DIR/assets/$STAGE/$STAGE-config-export.json
+  post_build:
+    commands:
+      - echo Build completed on `date`
+artifacts:
+  files:
+    - assets/$STAGE/$STAGE-config-export.json
+    - assets/$STAGE/deploy-model-$STAGE.yml
+  discard-paths: yes
