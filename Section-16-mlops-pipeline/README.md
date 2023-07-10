@@ -194,7 +194,7 @@ cd ~/environment/tests/unit_test/ &&\
 python app_test.py
 ```
 
-## Perform the System Test
+## System Test Assets
 ![](image-3.png)
 
 - Create new Branch
