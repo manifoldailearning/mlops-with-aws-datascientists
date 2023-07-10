@@ -261,5 +261,8 @@ aws cloudformation create-stack --stack-name abalone-pipeline \
 ```
 cd ~/environment/utils/ &&\
 sed -i "s/<PipelineBucket>/${PIPELINE_BUCKET}/" load_sim.py
+```
+
+```
 python3 load_sim.py
 ```
