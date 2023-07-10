@@ -66,7 +66,7 @@ git clone https://git-codecommit.${AWS_DEFAULT_REGION}.amazonaws.com/v1/repos/ml
 - Validate CodeCommit Repository created
 - Validate Repository created under ECR 
 ```
-python3 ~/environment/mlops-tutorial/utils/repository_validation.py
+python3 ~/environment/utils/repository_validation.py
 ```
 
 # 2. Configure the Assets
@@ -77,7 +77,7 @@ python3 ~/environment/mlops-tutorial/utils/repository_validation.py
 ```
 cd ~/environment/mlops
 git checkout -b etl
-cp ~/environment/mlops-tutorial/etl/* .
+cp ~/environment/etl/* .
 ls
 ```
 - Copy the files inside the etl folder to the `mlops` local repo
@@ -100,7 +100,7 @@ git rm -rf .
 ```
 - Copy the model files from `model` folder 
 ```
-cp -R ~/environment/mlops-tutorial/model/* .
+cp -R ~/environment/model/* .
 ```
 - Modify the `trainingjob.json` as follows:
     - *Replace Account id with respective Account id*
@@ -132,7 +132,7 @@ docker build --build-arg REGION=$AWS_DEFAULT_REGION -f Dockerfile -t tf_model:1.
 ```
 - build the Docker Image using Dockerfile
 ```
-cd ~/environment/mlops-tutorial/tests/unit_test/ && \
+cd ~/environment/tests/unit_test/ && \
 mkdir -p model && \
 mkdir -p output && \
 docker run --rm --name 'my_model' \
@@ -162,11 +162,14 @@ docker run --rm --name 'my_model' \
 
 ## Test the API
 ```
-cd ~/environment/mlops-tutorial/tests/unit_test/ &&\
+cd ~/environment/tests/unit_test/ &&\
 python app_test.py
 ```
 
 ## Perform the System Test
+
+![Alt text](image.png)
+
 - Create new Branch
 ```
 cd ~/environment/mlops && \
@@ -178,7 +181,7 @@ git rm -rf .
 ```
 - get the files for the branch
 ```
-cp -R ~/environment/mlops-tutorial/tests/system_test/* .
+cp -R ~/environment/tests/system_test/* .
 ```
 - Modify threshold value
 ```
@@ -204,7 +207,7 @@ parameters="$parameters ParameterKey=RoleName,ParameterValue=%s"
 
 
 ```
-cd ~/environment/mlops-tutorial/pipeline && \
+cd ~/environment/pipeline && \
 aws cloudformation package --template-file mlops-pipeline.yml \
 --s3-bucket $PIPELINE_BUCKET --s3-prefix abalone-pipeline/artifacts \
 --output-template-file mlops-pipeline-output.yml
@@ -218,7 +221,7 @@ aws s3 cp ~/environment/abalone.csv "s3://${DATA_BUCKET}/input/raw/abalone.csv" 
 
 - Load simulation
 ```
-cd ~/environment/mlops-tutorial/utils/ &&\
+cd ~/environment/utils/ &&\
 sed -i "s/<PipelineBucket>/${PIPELINE_BUCKET}/" load_sim.py
 python3 load_sim.py
 ```
