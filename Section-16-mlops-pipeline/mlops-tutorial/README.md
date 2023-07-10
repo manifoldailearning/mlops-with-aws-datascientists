@@ -167,7 +167,6 @@ python app_test.py
 ```
 
 ## Perform the System Test
-
 ![Alt text](image.png)
 
 - Create new Branch
