@@ -241,9 +241,17 @@ aws cloudformation package --template-file mlops-pipeline.yml \
 ```
 
 ```
-wget https://raw.githubusercontent.com/manifoldailearning/mlops-with-aws-datascientists/main/Section-16-mlops-pipeline/dataset/abalone.csv
 aws s3 cp ~/environment/abalone.csv "s3://${DATA_BUCKET}/input/raw/abalone.csv" --region $AWS_DEFAULT_REGION
 ```
+
+```
+cd ~/environment/pipeline && \
+aws cloudformation package --template-file mlops-pipeline.yml \
+--s3-bucket $PIPELINE_BUCKET --s3-prefix abalone-pipeline/artifacts \
+--output-template-file mlops-pipeline-output.yml
+```
+
+
 
 # 4. Review the Pipelines and Various Stages
 
