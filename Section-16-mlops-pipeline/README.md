@@ -195,6 +195,8 @@ python app_test.py
 ```
 
 ## Perform the System Test
+![](image-3.png)
+
 - Create new Branch
 ```
 cd ~/environment/mlops && \
