@@ -222,7 +222,7 @@ git push --set-upstream origin test
 ```
 
 # 3. Pipeline Execution
-
+![Alt text](image-4.png)
 ## Creation of pipeline
 ```
 unset parameters
