@@ -1,0 +1,47 @@
+Parameters:
+  LatestAmiId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+
+  EnvType:
+    Description: Specify the Environment type of the stack.
+    Type: String
+    AllowedValues:
+      - test
+      - prod
+    Default: test
+    ConstraintDescription: Specify either test or prod.
+
+Conditions:
+  IsProduction: !Equals
+    - !Ref EnvType
+    - prod
+
+Resources:
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref LatestAmiId
+      InstanceType: !If [IsProduction, t2.nano, t2.micro]
+
+  MountPoint:
+    Type: AWS::EC2::VolumeAttachment
+    Properties:
+      InstanceId: !Ref EC2Instance
+      VolumeId: !Ref Volume
+      Device: /dev/sdh
+    Condition: IsProduction
+
+  Volume:
+    Type: AWS::EC2::Volume
+    Properties:
+      Size: 2
+      AvailabilityZone: !GetAtt EC2Instance.AvailabilityZone
+      Encrypted: true
+    Condition: IsProduction
+
+Outputs:
+  VolumeId:
+    Value: !Ref Volume
+    Condition: IsProduction
+

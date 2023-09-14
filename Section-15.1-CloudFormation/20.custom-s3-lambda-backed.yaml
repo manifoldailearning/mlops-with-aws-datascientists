@@ -1,0 +1,96 @@
+Parameters:
+  S3BucketName:
+    Type: String
+    Description: "Specify the S3 bucket to create"
+    AllowedPattern: "[a-zA-Z][a-zA-Z0-9_-]*"
+
+Resources:
+  SampleS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref S3BucketName
+    DeletionPolicy: Delete
+
+  S3CustomResource:
+    Type: Custom::S3CustomResource # AWS::CloudFormation::CustomResource 
+    Properties:
+      ServiceToken: !GetAtt AWSLambdaFunction.Arn
+      bucket_name: !Ref SampleS3Bucket    
+
+  AWSLambdaFunction:
+     Type: AWS::Lambda::Function
+     Properties:
+       Description: "Lambda Function to Empty an S3 bucket!"
+       FunctionName: !Sub '${AWS::StackName}-${AWS::Region}-lambda'
+       Handler: index.handler
+       Role: !GetAtt AWSLambdaExecutionRole.Arn
+       Timeout: 360
+       Runtime: python3.8
+       Code:
+         ZipFile: |
+          import boto3
+          import cfnresponse
+          ### cfnresponse module help in sending responses to CloudFormation
+          ### instead of writing your own code
+
+          def handler(event, context):
+              # Get request type
+              the_event = event['RequestType']        
+              print("The event is: ", str(the_event))
+
+              response_data = {}
+              s3 = boto3.client('s3')
+
+              # Retrieve parameters (bucket name)
+              bucket_name = event['ResourceProperties']['bucket_name']
+              
+              try:
+                  if the_event == 'Delete':
+                      print("Deleting contents of S3 Bucket")
+                      b_operator = boto3.resource('s3')
+                      b_operator.Bucket(str(bucket_name)).objects.all().delete()
+                  print("Execution succesfull!")
+                  cfnresponse.send(event, context, cfnresponse.SUCCESS, response_data)
+              except Exception as e:
+                  print("Execution failed... some error")
+                  print(str(e))
+                  response_data['Data'] = str(e)
+                  cfnresponse.send(event, context, cfnresponse.FAILED, response_data)
+
+  AWSLambdaExecutionRole:
+     Type: AWS::IAM::Role
+     Properties:
+       AssumeRolePolicyDocument:
+         Statement:
+         - Action:
+           - sts:AssumeRole
+           Effect: Allow
+           Principal:
+             Service:
+             - lambda.amazonaws.com
+         Version: '2012-10-17'
+       Path: "/"
+       Policies:
+       - PolicyDocument:
+           Statement:
+           - Action:
+             - logs:CreateLogGroup
+             - logs:CreateLogStream
+             - logs:PutLogEvents
+             Effect: Allow
+             Resource: arn:aws:logs:*:*:*
+           Version: '2012-10-17'
+         PolicyName: !Sub ${AWS::StackName}-${AWS::Region}-AWSLambda-CW
+       - PolicyDocument:
+           Statement:
+           - Action:
+             - s3:PutObject
+             - s3:DeleteObject
+             - s3:List*
+             Effect: Allow
+             Resource:
+             - !Sub arn:aws:s3:::${SampleS3Bucket}
+             - !Sub arn:aws:s3:::${SampleS3Bucket}/*
+           Version: '2012-10-17'
+         PolicyName: !Sub ${AWS::StackName}-${AWS::Region}-AWSLambda-S3
+       RoleName: !Sub ${AWS::StackName}-${AWS::Region}-AWSLambdaExecutionRole

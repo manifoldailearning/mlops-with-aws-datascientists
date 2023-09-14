@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: AWS DevOps Course Manifold AI Learning
+
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      Tags:
+        - Key: Purpose
+          Value: Manfiold AI Learning Student
+
+  S3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3Bucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action:
+              - s3:*
+            Effect: Deny
+            Resource:
+              - !GetAtt S3Bucket.Arn
+              - !Sub '${S3Bucket.Arn}/*'
+            Principal: '*'
+            Condition:
+              Bool:
+                aws:SecureTransport: false
+
+Outputs:
+  S3BucketDomainName:
+    Description: IPv4 DNS name of the bucket.
+    Value: !GetAtt S3Bucket.DomainName

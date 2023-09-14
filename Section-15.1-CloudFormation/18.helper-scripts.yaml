@@ -1,0 +1,182 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: AWS DevOps Course Manifold AI Learning
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Amazon EC2 Configuration
+        Parameters:
+          - AmiID
+    ParameterLabels:
+      AmiID:
+        default: Amazon Machine Image ID
+
+Parameters:
+  EnvironmentType:
+    Description: Specify the Environment type of the stack.
+    Type: String
+    AllowedValues:
+      - Dev
+      - Test
+      - Prod
+    Default: Test
+    ConstraintDescription: Specify either Dev, Test or Prod.
+
+  AmiID:
+    Description: The ID of the AMI.
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+
+Mappings:
+  EnvironmentToInstanceType:
+    Dev:
+      InstanceType: t2.nano
+    Test:
+      InstanceType: t2.micro
+    Prod:
+      InstanceType: t2.small
+
+Resources:
+  SSMIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+
+  WebServerInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref SSMIAMRole
+
+  WebServerInstance:
+    CreationPolicy:
+      ResourceSignal:
+        Count: 1
+        Timeout: PT10M
+    Type: AWS::EC2::Instance
+    Metadata:
+      AWS::CloudFormation::Init:
+        config:
+          packages:
+            yum:
+              httpd: []
+              php: []
+          files:
+            /var/www/html/index.php:
+              content: |
+                <!DOCTYPE html>
+                <html>
+                <body>
+                  <center>
+                    <?php
+                    # Get the instance ID from meta-data and store it in the $instance_id variable
+                    $url = "http://169.254.169.254/latest/meta-data/instance-id";
+                    $instance_id = file_get_contents($url);
+                    # Get the instance's availability zone from metadata and store it in the $zone variable
+                    $url = "http://169.254.169.254/latest/meta-data/placement/availability-zone";
+                    $zone = file_get_contents($url);
+                    # Get the instance AMI ID and store it in the $ami_id variable
+                    $url = "http://169.254.169.254/latest/meta-data/ami-id";
+                    $ami_id = file_get_contents($url);
+                    ?>
+                    <h2>EC2 Instance ID: <?php echo $instance_id ?></h2>
+                    <h2>Availability Zone: <?php echo $zone ?></h2>
+                    <h2>AMI ID: <?php echo $ami_id ?></h2>
+                    <p> We hope you are enjoying learning with us, feel free to share feedback </p>
+                  </center>
+                </body>
+                </html>
+              mode: 000644
+              owner: apache
+              group: apache
+            /etc/cfn/cfn-hup.conf:
+              content: !Sub |
+                [main]
+                stack=${AWS::StackId}
+                region=${AWS::Region}
+                interval=1
+              mode: 000400
+              owner: root
+              group: root
+            /etc/cfn/hooks.d/cfn-auto-reloader.conf:
+              content: !Sub |
+                [cfn-auto-reloader-hook]
+                triggers=post.update
+                path=Resources.WebServerInstance.Metadata.AWS::CloudFormation::Init
+                action=/opt/aws/bin/cfn-init --stack ${AWS::StackName} --resource WebServerInstance --region ${AWS::Region}
+                runas=root
+          services:
+            sysvinit:
+              httpd:
+                enabled: true
+                ensureRunning: true
+              cfn-hup:
+                enabled: true
+                ensureRunning: true
+                files:
+                  - /etc/cfn/cfn-hup.conf
+                  - /etc/cfn/hooks.d/cfn-auto-reloader.conf
+    Properties:
+      IamInstanceProfile: !Ref WebServerInstanceProfile
+      ImageId: !Ref AmiID
+      InstanceType: !FindInMap [EnvironmentToInstanceType, !Ref EnvironmentType, InstanceType]
+      SecurityGroupIds:
+        - !Ref WebServerSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Join ['-', [!Ref EnvironmentType, webserver]]
+      UserData: !Base64
+        Fn::Sub: |
+          #!/bin/bash -xe
+          # Update aws-cfn-bootstrap to the latest
+          yum install -y aws-cfn-bootstrap
+          # Call cfn-init script to install files and packages
+          /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource WebServerInstance --region ${AWS::Region}
+          # Call cfn-signal script to send a signal with exit code
+          /opt/aws/bin/cfn-signal --exit-code $? --stack ${AWS::StackName} --resource WebServerInstance --region ${AWS::Region}
+
+  WebServerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: F1000
+            reason: This is using default VPC where we dont know VpcId to support egress. Missing egress rule means all traffic is allowed outbound.
+    Properties:
+      GroupDescription: Enable HTTP access via port 80
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+  WebServerEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref WebServerInstance
+
+Outputs:
+  WebServerPublicDNS:
+    Description: Public DNS of EC2 instance
+    Value: !GetAtt WebServerInstance.PublicDnsName
+
+  WebServerElasticIP:
+    Description: Elastic IP assigned to EC2
+    Value: !Ref WebServerEIP
+
+  WebsiteURL:
+    Description: Application URL
+    Value: !Sub http://${WebServerEIP}

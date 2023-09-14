@@ -1,0 +1,15 @@
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      Tags:
+        - Key: Name
+          Value: AWSDevOps-Resource-dependencies-ManifoldAILearning
+
+  SNSTopic:
+    Type: AWS::SNS::Topic
+    DependsOn: S3Bucket
+    Properties:
+      Tags:
+        - Key: Name
+          Value: AWSDevOps-Resource-dependencies-ManifoldAILearning

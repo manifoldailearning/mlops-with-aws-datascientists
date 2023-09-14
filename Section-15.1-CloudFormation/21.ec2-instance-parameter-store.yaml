@@ -1,0 +1,11 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: AWS DevOps Course Manifold AI Learning
+
+Resources:
+  Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: !Select ["0", !GetAZs ""]
+      InstanceType: t2.micro
+      ImageId: '{{resolve:ssm:/golden-images/amazon-linux-2}}'

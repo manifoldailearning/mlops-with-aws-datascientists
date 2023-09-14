@@ -1,0 +1,28 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'AWS DevOps Manifold AI Learning'
+Resources:
+  MyInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: us-east-1a
+      ImageId: ami-09538990a0c4fe9be
+      InstanceType: t2.micro
+      KeyName: aws-devops
+      Tags:
+        - Key: "Name"
+          Value: "Manifold-AI-Learning"
+        - Key: "Course"
+          Value: "DevOps"
+  
+  NewInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: us-east-1b
+      ImageId: ami-09538990a0c4fe9be
+      InstanceType: t2.micro
+      KeyName: aws-devops
+      Tags:
+        - Key: "Name"
+          Value: "V2-Manifold-AI-Learning"
+        - Key: "Course"
+          Value: "V2-DevOps"
