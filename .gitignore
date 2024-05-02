@@ -1,0 +1,9 @@
+__pycache__/
+venv_package/
+.pytest_cache
+.ipynb_checkpoints
+.ipynb_checkpoints/*
+*/.ipynb_checkpoints/*
+.DS_Store
+prepare-the-dataset.ipynb
+prepare-the-dataset*.ipynb
