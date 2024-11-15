@@ -5,5 +5,3 @@ venv_package/
 .ipynb_checkpoints/*
 */.ipynb_checkpoints/*
 .DS_Store
-prepare-the-dataset.ipynb
-prepare-the-dataset*.ipynb
